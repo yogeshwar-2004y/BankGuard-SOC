@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+@theme {
+  --color-background: #0b111c;
+  --color-surface: #121b29;
+  --color-elevated: #1a2637;
+  --color-line: #2a3749;
+  --color-ink: #eef3fa;
+  --color-muted: #9cacbf;
+  --color-brand: #60d6b3;
+  --color-critical: #fb8e9b;
+  --color-high: #f5b573;
+  --color-medium: #e6cf7b;
+  --color-low: #84b9f5;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+@layer base {
+  * {
+    @apply border-line;
+  }
+  body {
+    @apply m-0 bg-background text-ink antialiased;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand;
+  }
+  button,
+  a {
+    @apply touch-manipulation;
+  }
+  button:not(:disabled),
+  select {
+    cursor: pointer;
+  }
+  input,
+  select,
+  textarea {
+    @apply min-h-11 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-ink;
+  }
+  label {
+    @apply block space-y-2 text-sm font-medium;
+  }
+  summary {
+    @apply cursor-pointer;
+  }
+  ::selection {
+    @apply bg-brand/30;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

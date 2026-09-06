@@ -1,0 +1,21 @@
+# Use behind an HTTPS reverse proxy or load balancer; see docs/deployment.md.
+services:
+  backend:
+    environment:
+      APP_ENV: production
+      CORS_ORIGINS: ${CORS_ORIGINS:?Set an HTTPS origin}
+      DEMO_CUSTOMER_PASSWORD: ${DEMO_CUSTOMER_PASSWORD:?Set a unique password}
+      DEMO_ANALYST_PASSWORD: ${DEMO_ANALYST_PASSWORD:?Set a unique password}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:?Set a unique password}
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+  frontend:
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a unique database password}

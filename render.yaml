@@ -1,0 +1,43 @@
+services:
+  # BankGuard SOC Unified Web Service
+  - type: web
+    name: bankguard-soc
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: development
+      - key: CORS_ORIGINS
+        value: "http://localhost:5173,http://localhost:8080"
+      - key: SEED_DEMO
+        value: "true"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: SIMULATION_INTERVAL
+        value: "1.5"
+      - key: DEMO_CUSTOMER_EMAIL
+        value: customer@bankguard.test
+      - key: DEMO_CUSTOMER_PASSWORD
+        value: Customer-demo-123!
+      - key: DEMO_ANALYST_EMAIL
+        value: analyst@bankguard.test
+      - key: DEMO_ANALYST_PASSWORD
+        value: Analyst-demo-123!
+      - key: DEMO_ADMIN_EMAIL
+        value: admin@bankguard.test
+      - key: DEMO_ADMIN_PASSWORD
+        value: Admin-demo-123!
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bankguard-db
+          property: connectionString
+
+databases:
+  - name: bankguard-db
+    databaseName: bankguard
+    user: bankguard
+    plan: free
+    region: oregon

@@ -1,0 +1,60 @@
+name: bankguard-soc
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bankguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-demo-database-only}
+      POSTGRES_DB: ${POSTGRES_DB:-bankguard}
+    volumes:
+      - bankguard-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    restart: unless-stopped
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/backend.Dockerfile
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bankguard}:${POSTGRES_PASSWORD:-local-demo-database-only}@postgres:5432/${POSTGRES_DB:-bankguard}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      DEMO_CUSTOMER_EMAIL: ${DEMO_CUSTOMER_EMAIL:-customer@bankguard.test}
+      DEMO_CUSTOMER_PASSWORD: ${DEMO_CUSTOMER_PASSWORD:-Customer-demo-123!}
+      DEMO_ANALYST_EMAIL: ${DEMO_ANALYST_EMAIL:-analyst@bankguard.test}
+      DEMO_ANALYST_PASSWORD: ${DEMO_ANALYST_PASSWORD:-Analyst-demo-123!}
+      DEMO_ADMIN_EMAIL: ${DEMO_ADMIN_EMAIL:-admin@bankguard.test}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-Admin-demo-123!}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SIMULATION_INTERVAL: ${SIMULATION_INTERVAL:-1.5}
+      SEED_DEMO: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    restart: unless-stopped
+  frontend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/frontend.Dockerfile
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  bankguard-data:
