@@ -21,7 +21,7 @@ packaging==26.3
 pillow==12.3.0
 pluggy==1.6.0
 psycopg==3.3.3
-psycopg-binary==3.3.3
+psycopg-binary==3.3.5
 pycparser==3.0
 pydantic==2.13.5
 pydantic-settings==2.14.2
